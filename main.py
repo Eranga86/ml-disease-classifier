@@ -56,6 +56,10 @@ async def predict(file: UploadFile = File(...)):
             content={"status": "error", "message": f"Server error: {str(e)}"}
         )
 
+@app.get("/health")
+async def health_check():
+    return {"status": "ok", "message": "Server is running!"}
+
 if __name__ == "__main__":
 
     port = int(os.environ.get("PORT", 3000))  # default to 3000 for local testing
