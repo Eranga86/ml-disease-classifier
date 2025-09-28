@@ -5,3 +5,4 @@ uvicorn
 pillow
 numpy
 joblib
+os
