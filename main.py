@@ -83,11 +83,22 @@ async def predict(file: UploadFile = File(...)):
 
         # Extract features like training
         features = extract_features_from_pil(image)
+
+        # Prediction + probability
         prediction = model.predict(features)[0]
-        return {"prediction": str(prediction)}
+        probabilities = model.predict_proba(features)[0]
+
+        # Map class probabilities with class labels
+        class_labels = model.classes_
+        prob_dict = {str(label): float(prob) for label, prob in zip(class_labels, probabilities)}
+
+        return {
+            "prediction": str(prediction),
+            "probabilities": prob_dict
+        }
     except Exception as e:
         return JSONResponse(status_code=500, content={"status":"error","message": str(e)})
-
+        
 # --- Run server ---
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
