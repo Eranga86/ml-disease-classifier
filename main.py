@@ -9,13 +9,6 @@ import os
 
 app = FastAPI()
 
-# Load your trained model safely
-try:
-    model = joblib.load("best_paddy_rf_model.pkl")
-except Exception as e:
-    print("Error loading model:", e)
-    model = None
-
 def preprocess_image(image: Image.Image):
     image = image.resize((128, 128))  # resize to model input size
     image = np.array(image) / 255.0   # normalize
@@ -24,6 +17,13 @@ def preprocess_image(image: Image.Image):
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
+    # Load your trained model safely
+    try:
+        model = joblib.load("best_paddy_rf_model.pkl")
+    except Exception as e:
+        print("Error loading model:", e)
+        model = None
+
     if model is None:
         return JSONResponse(
             status_code=500,
