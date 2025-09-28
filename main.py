@@ -5,16 +5,9 @@ import joblib
 from PIL import Image, UnidentifiedImageError
 import numpy as np
 import io
-import os
+import os    
 
 app = FastAPI()
-
-# Load your trained model safely
-try:
-    model = joblib.load("best_paddy_rf_model.pkl")
-except Exception as e:
-    print("Error loading model:", e)
-    model = None
 
 def preprocess_image(image: Image.Image):
     image = image.resize((128, 128))  # resize to model input size
@@ -24,6 +17,13 @@ def preprocess_image(image: Image.Image):
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
+    # Load your trained model safely
+    try:
+        model = joblib.load("best_paddy_rf_model.pkl")
+    except Exception as e:
+        print("Error loading model:", e)
+        model = None
+
     if model is None:
         return JSONResponse(
             status_code=500,
@@ -61,6 +61,5 @@ async def health_check():
     return {"status": "ok", "message": "Server is running!"}
 
 if __name__ == "__main__":
-
     port = int(os.environ.get("PORT", 3000))  # default to 3000 for local testing
     uvicorn.run(app, host="0.0.0.0", port=port)
